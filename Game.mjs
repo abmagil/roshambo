@@ -1,4 +1,3 @@
-import ConsoleStream from "console-stream";
 import { comparator } from "./Moves.mjs";
 
 export class Game {
@@ -8,7 +7,6 @@ export class Game {
   constructor(players, winNumber = 2) {
     this.players = players;
     this.winNumber = winNumber;
-    this.stream = new ConsoleStream();
   }
 
   get winner() {
@@ -21,7 +19,7 @@ export class Game {
       const moves = await gatherMoves(this.players, lastMoves);
       lastMoves = moves;
       scoreMoves(moves, this.playerScores);
-      this.stream.write(`${moves[0].selection}|${moves[1].selection}`)
+      console.log(`${moves[0].selection}|${moves[1].selection}`)
     }
     console.log(`${this.winner.toString()} has won`)
     return this.winner;
