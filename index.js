@@ -1,4 +1,5 @@
-import { Game } from "./Game.mjs";
+import { Game }from "./Game.mjs";
+import { Round } from "./Round.mjs";
 import { 
   AlwaysRock,
   AlwaysPaper,

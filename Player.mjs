@@ -1,15 +1,8 @@
 import { MOVES } from "./Moves.mjs";
 import { randomFromArray } from "./randomFromArray.mjs";
 export class Player {
-  score;
-  
   constructor(name) {
     this.name = name
-    this.score = 0;
-  }
-
-  scoreAPoint() {
-    this.score = this.score + 1;
   }
 
   async selectMove(previousMove) {

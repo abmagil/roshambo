@@ -1,50 +1,53 @@
-import { comparator } from "./Moves.mjs";
+import { Round } from "./Round.mjs";
 
 export class Game {
-  players;
-  winNumber;
-
-  constructor(players, winNumber = 2) {
-    this.players = players;
-    this.winNumber = winNumber;
+  playerScores;
+  numRounds;
+  /**
+   * 
+   * @param players {Player[]}
+   * @param numRounds {number}
+   */
+  constructor(players, numRounds = 1) {
+    this.numRounds = numRounds;
+    this.playerScores = players.reduce((acc, cur) => {
+      return {
+        ...acc,
+        [cur.name]: {
+          score: 0,
+          player: cur
+        }
+      }
+    }, {})
   }
 
+  get players() {
+    return Object.values(this.playerScores).map(playerAndScore => playerAndScore.player)
+  }
+
+  /**
+   * @returns {Player}
+   */
   get winner() {
-    return this.players.find(player => player.score >= this.winNumber);
+    const playersAndScores = Object.values(this.playerScores);
+    playersAndScores.sort((a, b) => {
+      return a.score > b.score;
+    });
+    return playersAndScores[0].player;
   }
 
   async play() {
-    console.log(`playing a game with ${this.players[0]} (${this.players[0].constructor.name}) and ${this.players[1]} (${this.players[1].constructor.name})`);
-    let lastMoves = [];
-    while (!(this.winner)) {
-      const moves = await gatherMoves(this.players, lastMoves);
-      lastMoves = moves;
-      scoreMoves(moves, this.playerScores);
-      console.log(`${moves[0].selection} | ${moves[1].selection}`)
+    console.log(`Playing a game with ${this.players[0]} (${this.players[0].constructor.name}) and ${this.players[1]} (${this.players[0].constructor.name}`)
+    let playedRounds = 0;
+    while (playedRounds < this.numRounds) {
+      const round = new Round(this.players, 3);
+      const roundWinner = await round.play();
+      console.log(`${roundWinner.toString()} has won this round`)
+      this.playerScores[roundWinner.name].score = this.playerScores[roundWinner.name].score + 1;
+      playedRounds = playedRounds + 1;
     }
-    console.log(`${this.winner.toString()} has won`)
+    console.log(`${this.winner.toString()} has won this game`);
     return this.winner;
   }
-}
 
-async function gatherMoves(players, previousMoves) {
-  return Promise.all(
-    players.map(async (player) => {
-      const otherPlayerMoves = previousMoves.filter(playerMove => playerMove.player.name !== player.name)[0];
-      const playerSelection = await player.selectMove(otherPlayerMoves);
-      return {
-        selection: playerSelection,
-        player: player,
-      }
-    })
-  )
-}
-
-function scoreMoves(moves, scores) {
-  if (comparator(moves[0].selection, moves[1].selection) > 0) {
-    moves[0].player.scoreAPoint();
-  }
-  if (comparator(moves[0].selection, moves[1].selection) < 0) {
-    moves[1].player.scoreAPoint();
-  }
 }
