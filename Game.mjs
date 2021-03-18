@@ -14,12 +14,13 @@ export class Game {
   }
 
   async play() {
+    console.log(`playing a game with ${this.players[0]} (${this.players[0].constructor.name}) and ${this.players[1]} (${this.players[1].constructor.name})`);
     let lastMoves = [];
     while (!(this.winner)) {
       const moves = await gatherMoves(this.players, lastMoves);
       lastMoves = moves;
       scoreMoves(moves, this.playerScores);
-      console.log(`${moves[0].selection}|${moves[1].selection}`)
+      console.log(`${moves[0].selection} | ${moves[1].selection}`)
     }
     console.log(`${this.winner.toString()} has won`)
     return this.winner;
@@ -29,7 +30,7 @@ export class Game {
 async function gatherMoves(players, previousMoves) {
   return Promise.all(
     players.map(async (player) => {
-      const otherPlayerMoves = previousMoves.filter(playerMove => playerMove.player.name === player.name);
+      const otherPlayerMoves = previousMoves.filter(playerMove => playerMove.player.name !== player.name)[0];
       const playerSelection = await player.selectMove(otherPlayerMoves);
       return {
         selection: playerSelection,
